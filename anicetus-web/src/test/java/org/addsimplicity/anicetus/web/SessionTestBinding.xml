@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.2.0.xsd">
+
+	<bean id="sessionContext" class="org.addsimplicity.anicetus.web.TelemetryHttpContext" scope="request">
+		<property name="deliveryAdapter"><ref bean="jmsDA"/></property>
+		<property name="operationName" value="testName"/>
+		<property name="excludeHeaders">
+			<set>
+				<value>X-ANICETUS-PARENT-GUID</value>
+			</set>
+		</property>
+		<property name="excludeParameters">
+			<set>
+				<value>NOTPASSED</value>
+			</set>
+		</property>
+	</bean>
+
+</beans>

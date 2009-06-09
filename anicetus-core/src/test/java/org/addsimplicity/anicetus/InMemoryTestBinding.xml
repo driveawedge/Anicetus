@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="stream" class="org.addsimplicity.anicetus.InMemoryAdapter"/>
+	<bean id="jsonTrans" class="org.addsimplicity.anicetus.io.JsonEncoder"/>
+	
+	<bean id="adapter" class="org.addsimplicity.anicetus.io.FileDeliveryAdapter">
+		<property name="writer" ref="stream"/>
+		<property name="translator" ref="jsonTrans"/>
+	</bean>
+	
+	<bean id="manager" class="org.addsimplicity.anicetus.TelemetryContext" scope="prototype">
+		<property name="deliveryAdapter" ref="adapter"/>
+		<property name="operationName" value="testName"/>
+	</bean>
+</beans>

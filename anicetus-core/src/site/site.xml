@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="anicetus-core">
+  <bannerLeft>
+    <name>Anicetus Core</name>
+     <href>http://anicitus.sourceforge.net/anicetus-core/</href>
+  </bannerLeft>
+  <body>
+    <menu name="Anicetus Core">
+      <item name="Introduction" href="index.html"/>
+    </menu>
+
+    <menu ref="reports"/>
+  </body>
+</project>

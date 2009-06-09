@@ -1,0 +1,124 @@
+
+	<!--
+		Copyright 2008-2009 Dan Pritchett Licensed under the Apache License,
+		Version 2.0 (the "License"); you may not use this file except in
+		compliance with the License. You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.addsimplicity.anicetus</groupId>
+	<artifactId>anicetus-core</artifactId>
+	<packaging>jar</packaging>
+	<version>0.1-SNAPSHOT</version>
+	<name>anicetus-core</name>
+	<repositories>
+	</repositories>
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>LICENSE.txt</url>
+		</license>
+	</licenses>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring</artifactId>
+			<version>2.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-asl</artifactId>
+			<version>0.9.5</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-core</artifactId>
+			<version>5.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>3.5</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<description>Anicetus is a telemetry framework that simplifies the task of producing streams of information that make monitoring applications easier.</description>
+	<url>http://anicitus.sourceforge.net/</url>
+	<issueManagement>
+		<system>Tracker</system>
+		<url>https://sourceforge.net/tracker/?group_id=236402&amp;atid=1099880</url>
+	</issueManagement>
+	<developers>
+		<developer>
+			<id>dan</id>
+			<name>Dan Pritchett</name>
+			<email>driveawedge@yahoo.com</email>
+			<url>http://www.addsimplicity.com/</url>
+			<timezone>-8</timezone>
+			<roles>
+				<role>Lead</role>
+			</roles>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:svn:https://anicitus.svn.sourceforge.net/svnroot/anicitus</connection>
+		<url>http://anicitus.svn.sourceforge.net/viewvc/anicitus/</url>
+	</scm>
+	<organization>
+		<name>Add Simplicity</name>
+		<url>http://www.addsimplicity.com/</url>
+	</organization>
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.4.3</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>

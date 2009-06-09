@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.addsimplicity.anicetus.hibernate.SimpleBean" table="BEANS">
+        <id name="id" column="BEAN_ID">
+            <generator class="native"/>
+        </id>
+        <property name="date" type="timestamp" column="BEAN_DATE"/>
+        <property name="text"/>
+    </class>
+
+</hibernate-mapping>

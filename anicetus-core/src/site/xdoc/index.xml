@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+	<properties>
+		<author>Dan Pritchett (driveawedge@yahoo.com)</author>
+		<title>Anicetus Core</title>
+	</properties>
+	
+	<body>
+		<section name="Introduction">
+			<p>
+			Anicetus Core is an implementation of the
+			<a href="http://anicitus.wiki.sourceforge.net/">Anicetus Framework</a> in Java.
+			The framework leverages <a href="http://www.springsource.org/">Spring</a> wherever possible to
+			improve the flexibility of Anicetus but the use of Spring is only required for JMS publication.
+			The Java implementation follows the design outlined by the general framework very closely.
+			</p>
+		</section>
+		<section name="Usage">
+			<p>
+			The Anicetus Java implementation is based on the concept of an execution context that has
+			a meaning relative to some unit of work. A simple example is a servlet request, the context
+			being relative to a doGet or doPost method. A context has a clear life cycle of when it begins
+			and when it ends. A telemetry session begins when the context begins and ends when the context
+			ends. The session is published when the context ends.
+			</p>
+			<p>
+			The context also provides factories for creating other telemetry artifacts as children of the
+			session. The factories manage the concept of nested transactions, states, and events, allowing
+			multiple levels of nesting. These factories make it convenient to properly establish the
+			hierarchy of telemetry that occurs within any application.
+			</p>
+			<p>
+			Ideally the context is created using Spring as it provides the necessary life cycle operations
+			for a variety of application types. The telemetry context is fully integrated with Spring and
+			responds to Spring life cycle events to manage the session life cycle. The Anicetus framework
+			is fully integrated with Spring to simplify the management of all components.
+			</p>
+		</section>
+	</body>
+</document>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:amq="http://activemq.apache.org/schema/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.2.0.xsd">
+
+	<amq:broker useJmx="false" persistent="false">
+		<amq:transportConnectors>
+			<amq:transportConnector uri="tcp://localhost:0" />
+		</amq:transportConnectors>
+	</amq:broker>
+
+	<amq:queue id="destination"
+		physicalName="org.apache.activemq.spring.Test.spring.embedded" />
+
+	<amq:connectionFactory id="jmsFactory" brokerURL="vm://localhost" />
+
+	<bean id="msgConv" class="org.addsimplicity.anicetus.io.jms.JsonMessageConverter">
+		<property name="encoder">
+			<bean class="org.addsimplicity.anicetus.io.JsonEncoder">
+				<property name="exceptionHandler">
+					<bean class="org.addsimplicity.anicetus.hibernate.FailModeExceptionHandler"/>
+				</property>
+			</bean>
+		</property>
+		<property name="decoder">
+			<bean class="org.addsimplicity.anicetus.io.JsonDecoder">
+				<property name="exceptionHandler">
+					<bean class="org.addsimplicity.anicetus.hibernate.FailModeExceptionHandler"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="connPool"
+		class="org.springframework.jms.connection.SingleConnectionFactory">
+		<property name="targetConnectionFactory">
+			<ref local="jmsFactory" />
+		</property>
+	</bean>
+
+	<bean id="jmsDA" class="org.addsimplicity.anicetus.io.jms.JMSDeliveryAdapter">
+		<property name="destination" ref="destination" />
+		<property name="connectionFactory" ref="connPool" />
+		<property name="messageConverter" ref="msgConv" />
+		<property name="exceptionHandler">
+			<bean class="org.addsimplicity.anicetus.hibernate.FailModeExceptionHandler"/>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:aniticus" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<bean id="interceptor"
+		class="org.addsimplicity.anicetus.hibernate.TelemetryInterceptor">
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>org/addsimplicity/anicetus/hibernate/anicetus.hbm.xml
+				</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect
+				</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+			</props>
+		</property>
+		<property name="entityInterceptor" ref="interceptor" />
+	</bean>
+
+	<bean id="transManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="jsonTranslator" class="org.addsimplicity.anicetus.io.JsonEncoder">
+	</bean>
+
+	<bean id="telemetryContext" class="org.addsimplicity.anicetus.TelemetryContext">
+		<property name="deliveryAdapter" ref="jmsDA" />
+	</bean>
+	
+		<bean id="consumeTempl" class="org.springframework.jms.core.JmsTemplate">
+		<property name="defaultDestination" ref="destination"/>
+		<property name="messageConverter" ref="msgConv"/>
+		<property name="connectionFactory" ref="connPool"/>
+	</bean>
+	
+</beans>

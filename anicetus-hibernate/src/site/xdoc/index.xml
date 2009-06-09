@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+	<properties>
+		<author>Dan Pritchett (driveawedge@yahoo.com)</author>
+		<title>Anicetus Hibernate</title>
+	</properties>
+	
+	<body>
+		<section name="Introduction">
+		<p>
+		The Anicetus Hibernate framework integrates with Hibernate to simplify the task of generating
+		telemetry from Hibernate transactions. Hibernate telemetry provides information about what
+		database tables, SQL, and Java entities are being used by the parent session. The Hibernate
+		telemetry framework is directly integrated with Spring.
+		</p>
+		</section>
+	</body>
+</document>

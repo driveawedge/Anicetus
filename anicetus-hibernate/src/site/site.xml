@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="anicetus-hibernate">
+  <bannerLeft>
+    <name>Anicetus Hibernate</name>
+     <href>http://anicitus.sourceforge.net/anicetus-hibernate/</href>
+  </bannerLeft>
+  <body>
+    <menu name="Anicetus Hibernate">
+      <item name="Introduction" href="index.html"/>
+    </menu>
+
+    <menu ref="reports"/>
+  </body>
+</project>
