@@ -17,7 +17,7 @@
 	<groupId>org.addsimplicity.anicetus</groupId>
 	<artifactId>anicetus-hibernate</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.8.0</version>
 	<name>anicetus-hibernate</name>
 	<description>The Anicetus Hibernate extensions builds upon the base Anicetus Java framework to automate the integration of Hibernate transactions into telemetry.</description>
 	<url>http://anicitus.sourceforge.net/</url>
@@ -108,7 +108,7 @@
 		<dependency>
 			<groupId>org.addsimplicity.anicetus</groupId>
 			<artifactId>anicetus-core</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
