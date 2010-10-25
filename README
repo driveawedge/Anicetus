@@ -1,0 +1,17 @@
+h1. Welcome to Anicetus
+
+Anicetus is a telemetry framework that makes it easy to add instrumentation to any Java
+application.
+
+h1. Documentation
+
+Anicetus documentation can be found at the wiki:
+
+http://github.com/driveawedge/Anicetus/wiki
+
+h1. Support
+
+Support is currently provided by Dan Pritchett:
+
+driveawedge@gmail.com
+
