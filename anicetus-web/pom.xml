@@ -4,7 +4,7 @@
 	<groupId>org.addsimplicity.anicetus</groupId>
 	<artifactId>anicetus-web</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.8.0</version>
 	<name>anicetus-web</name>
 	<url>http://maven.apache.org</url>
 	<repositories>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.addsimplicity.anicetus</groupId>
 			<artifactId>anicetus-core</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
