@@ -28,9 +28,9 @@ import org.addsimplicity.anicetus.entity.EntityTypeRegistry;
 import org.addsimplicity.anicetus.entity.GlobalInfo;
 import org.addsimplicity.anicetus.entity.JsonConstants;
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.JsonNode;
-import org.codehaus.jackson.map.JsonTypeMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * The decoder translates a JSON encoded telemetry into a Java object. In
@@ -53,7 +53,8 @@ public class JsonDecoder implements TelemetryDecoder {
 	private static final Map<Class<?>, Class<?>> s_primitiveBox = new HashMap<Class<?>, Class<?>>();
 
 	static {
-		EntityTypeRegistry.addSearchPackage(GlobalInfo.class.getPackage().getName());
+		EntityTypeRegistry.addSearchPackage(GlobalInfo.class.getPackage()
+				.getName());
 	}
 
 	static {
@@ -72,12 +73,12 @@ public class JsonDecoder implements TelemetryDecoder {
 	private ExceptionHandler m_exceptionHandler = new SystemErrorExceptionHandler();
 
 	/**
-	 * Convert a character array that represents a JSON encoded object. The entire
-	 * object graph will be decoded and returned as the appropriate root telemetry
-	 * artifact.
+	 * Convert a character array that represents a JSON encoded object. The
+	 * entire object graph will be decoded and returned as the appropriate root
+	 * telemetry artifact.
 	 * 
 	 * @param jsonEncoded
-	 *          The encoded JSON object as a character array.
+	 *            The encoded JSON object as a character array.
 	 */
 	public GlobalInfo decode(char[] jsonEncoded) {
 		CharArrayReader in = new CharArrayReader(jsonEncoded);
@@ -85,123 +86,92 @@ public class JsonDecoder implements TelemetryDecoder {
 		try {
 			JsonParser parser = fact.createJsonParser(in);
 
-			JsonTypeMapper mapper = new JsonTypeMapper();
+			ObjectMapper mapper = new ObjectMapper();
 
-			JsonNode node = mapper.read(parser);
+			JsonNode node = mapper.readTree(parser);
 
 			Object root = getTypedObject(node);
 			if (root instanceof GlobalInfo) {
 				fillType(node, root);
-			}
-			else {
+			} else {
 				return null;
 			}
 
 			return (GlobalInfo) root;
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			m_exceptionHandler.exceptionCaught(ioe);
 			return null;
 		}
 
 	}
 
-	/**
-	 * Return the exception handler in effect for the decoder.
-	 * 
-	 * @return the exception handler in effect.
-	 */
-	public ExceptionHandler getExceptionHandler() {
-		return m_exceptionHandler;
-	}
-
-	/**
-	 * Set the exception handler that will receive any exception that occurs
-	 * during decoding.
-	 * 
-	 * @param exceptionHandler
-	 *          The exception handler.
-	 */
-	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-		m_exceptionHandler = exceptionHandler;
-	}
-
 	private void fillType(JsonNode node, Object type) {
 		Iterator<String> names = node.getFieldNames();
 		while (names.hasNext()) {
 			String name = names.next();
-			JsonNode field = node.getFieldValue(name);
+			JsonNode field = node.get(name);
 			String pname = EntityTypeRegistry.getPropKey(name);
 			if (pname != null) {
 				name = pname;
 			}
 			if (field.isArray()) {
 				Method adder = getAdderMethod(name, type.getClass());
-				if (field.getElementValue(0).isObject() || adder != null) {
+				if (field.get(0).isObject() || adder != null) {
 					for (int e = 0; e < field.size(); e++) {
-						JsonNode ele = field.getElementValue(e);
+						JsonNode ele = field.get(e);
 						Object child = getTypedObject(ele);
 						if (child != null) {
 							fillType(ele, child);
 							try {
 								adder.invoke(type, child);
-							}
-							catch (IllegalAccessException iae) {
+							} catch (IllegalAccessException iae) {
 								m_exceptionHandler.exceptionCaught(iae);
-							}
-							catch (InvocationTargetException ite) {
+							} catch (InvocationTargetException ite) {
 								m_exceptionHandler.exceptionCaught(ite);
 							}
-						}
-						else {
+						} else {
 							try {
 								adder.invoke(type, ele.getTextValue());
-							}
-							catch (IllegalAccessException iae) {
+							} catch (IllegalAccessException iae) {
 								m_exceptionHandler.exceptionCaught(iae);
-							}
-							catch (InvocationTargetException ite) {
+							} catch (InvocationTargetException ite) {
 								m_exceptionHandler.exceptionCaught(ite);
 							}
 						}
 					}
-				}
-				else {
+				} else {
 					String ar[] = new String[field.size()];
 					for (int e = 0; e < field.size(); e++) {
-						ar[e] = field.getElementValue(e).getTextValue();
+						ar[e] = field.get(e).getTextValue();
 					}
 
 					if (type instanceof GlobalInfo) {
 						((GlobalInfo) type).put(name, ar);
-					}
-					else {
+					} else {
 						setTypedProperty(type, name, ar);
 					}
 				}
-			}
-			else if (field.isObject()) {
+			} else if (field.isObject()) {
 				Object value = getTypedObject(field);
 				if (value != null) {
 					fillType(field, value);
-				}
-				else {
-					m_exceptionHandler.exceptionCaught(new MissingPropertyException(name, type));
+				} else {
+					m_exceptionHandler
+							.exceptionCaught(new MissingPropertyException(name,
+									type));
 				}
 
 				if (type instanceof GlobalInfo) {
 					((GlobalInfo) type).put(name, value);
-				}
-				else {
+				} else {
 					setTypedProperty(type, name, value);
 				}
-			}
-			else {
-				Object value = getTypedValue(name, type.getClass(), field.getTextValue());
+			} else {
+				Object value = getTypedValue(name, type.getClass(),
+						field.getTextValue());
 				if (type instanceof GlobalInfo) {
 					((GlobalInfo) type).put(name, value);
-				}
-				else {
+				} else {
 					setTypedProperty(type, name, value);
 				}
 			}
@@ -219,8 +189,17 @@ public class JsonDecoder implements TelemetryDecoder {
 		return null;
 	}
 
+	/**
+	 * Return the exception handler in effect for the decoder.
+	 * 
+	 * @return the exception handler in effect.
+	 */
+	public ExceptionHandler getExceptionHandler() {
+		return m_exceptionHandler;
+	}
+
 	private Object getTypedObject(JsonNode node) {
-		JsonNode tnode = node.getFieldValue(JsonConstants.EntityType);
+		JsonNode tnode = node.get(JsonConstants.EntityType);
 		if (tnode == null) {
 			return null;
 		}
@@ -233,8 +212,7 @@ public class JsonDecoder implements TelemetryDecoder {
 		//
 		if (m_typeCache.containsKey(tname)) {
 			cls = m_typeCache.get(tname);
-		}
-		else {
+		} else {
 			// Is this a distinguished name?
 			//
 			cls = EntityTypeRegistry.getClassFromName(tname);
@@ -244,13 +222,13 @@ public class JsonDecoder implements TelemetryDecoder {
 				//
 				try {
 					cls = Class.forName(tname);
-				}
-				catch (ClassNotFoundException cfe) {
+				} catch (ClassNotFoundException cfe) {
 					// We can fall out here. Only interested in null.
 				}
 			}
 
-			// If we didn't get it there, then we have to walk through each package
+			// If we didn't get it there, then we have to walk through each
+			// package
 			// and try.
 			//
 			if (cls == null) {
@@ -261,8 +239,7 @@ public class JsonDecoder implements TelemetryDecoder {
 
 					try {
 						cls = Class.forName(fqcn.toString());
-					}
-					catch (ClassNotFoundException cfe) {
+					} catch (ClassNotFoundException cfe) {
 						// Again, looking for null
 					}
 
@@ -281,22 +258,21 @@ public class JsonDecoder implements TelemetryDecoder {
 		if (cls != null) {
 			try {
 				result = cls.newInstance();
-			}
-			catch (IllegalAccessException iae) {
+			} catch (IllegalAccessException iae) {
 				m_exceptionHandler.exceptionCaught(iae);
-			}
-			catch (InstantiationException ie) {
+			} catch (InstantiationException ie) {
 				m_exceptionHandler.exceptionCaught(ie);
 			}
-		}
-		else {
-			m_exceptionHandler.exceptionCaught(new ClassNotFoundException(tname));
+		} else {
+			m_exceptionHandler
+					.exceptionCaught(new ClassNotFoundException(tname));
 		}
 
 		return result;
 	}
 
-	private Object getTypedValue(String name, Class<? extends Object> cls, String value) {
+	private Object getTypedValue(String name, Class<? extends Object> cls,
+			String value) {
 		try {
 			Method m = cls.getMethod(makeGetter(name), (Class[]) null);
 
@@ -318,13 +294,13 @@ public class JsonDecoder implements TelemetryDecoder {
 			Method conv = null;
 			try {
 				conv = ret.getMethod("fromString", String.class);
-			}
-			catch (NoSuchMethodException nse) {
+			} catch (NoSuchMethodException nse) {
 				// weird way to say not found...
 			}
 
 			if (conv == null) {
-				// Here we'll just fall out to the outside exception and return a
+				// Here we'll just fall out to the outside exception and return
+				// a
 				// string.
 				//
 				conv = ret.getMethod("valueOf", String.class);
@@ -333,19 +309,16 @@ public class JsonDecoder implements TelemetryDecoder {
 			if (conv != null) {
 				try {
 					return conv.invoke(null, value);
-				}
-				catch (InvocationTargetException ite) {
+				} catch (InvocationTargetException ite) {
 					m_exceptionHandler.exceptionCaught(ite);
-				}
-				catch (IllegalAccessException ie) {
+				} catch (IllegalAccessException ie) {
 					m_exceptionHandler.exceptionCaught(ie);
 				}
 			}
 
 			return value;
 
-		}
-		catch (NoSuchMethodException e) {
+		} catch (NoSuchMethodException e) {
 			return value;
 		}
 	}
@@ -366,22 +339,31 @@ public class JsonDecoder implements TelemetryDecoder {
 		return sb.toString();
 	}
 
+	/**
+	 * Set the exception handler that will receive any exception that occurs
+	 * during decoding.
+	 * 
+	 * @param exceptionHandler
+	 *            The exception handler.
+	 */
+	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+		m_exceptionHandler = exceptionHandler;
+	}
+
 	private void setTypedProperty(Object type, String name, Object value) {
-		String setter = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+		String setter = "set" + name.substring(0, 1).toUpperCase()
+				+ name.substring(1);
 
 		Class<?> cls = type.getClass();
 
 		try {
 			Method m = cls.getMethod(setter, value.getClass());
 			m.invoke(type, value);
-		}
-		catch (NoSuchMethodException nsme) {
+		} catch (NoSuchMethodException nsme) {
 			// Again, what could we do?
-		}
-		catch (InvocationTargetException ite) {
+		} catch (InvocationTargetException ite) {
 			// Ignore
-		}
-		catch (IllegalAccessException iae) {
+		} catch (IllegalAccessException iae) {
 			// Ignore
 		}
 	}

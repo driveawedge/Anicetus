@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.JsonNode;
-import org.codehaus.jackson.map.JsonTypeMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class InMemoryAdapter extends Writer {
 	private CharArrayWriter m_delegate;
@@ -29,39 +29,43 @@ public class InMemoryAdapter extends Writer {
 		m_delegate.flush();
 	}
 
-	@Override
-	public void write(char[] cbuf, int off, int len) throws IOException {
-		m_delegate.write(cbuf, off, len);
+	List<JsonNode> getAllObjects() throws Exception {
+		System.out.println(m_delegate.toCharArray());
+		JsonFactory fact = new JsonFactory();
+		JsonParser parser = fact.createJsonParser(new CharArrayReader(
+				m_delegate.toCharArray()));
+		ObjectMapper mapper = new ObjectMapper();
+
+		List<JsonNode> result = new ArrayList<JsonNode>();
+
+		while (true) {
+			try {
+				JsonNode node = mapper.readTree(parser);
+				if (node == null) {
+					break;
+				}
+				result.add(node);
+			} catch (Exception e) {
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	JsonNode getObjectGraph() throws Exception {
 		System.out.println(m_delegate.toCharArray());
 		JsonFactory fact = new JsonFactory();
-		JsonParser parser = fact.createJsonParser(new CharArrayReader(m_delegate
-				.toCharArray()));
-		JsonTypeMapper mapper = new JsonTypeMapper();
+		JsonParser parser = fact.createJsonParser(new CharArrayReader(
+				m_delegate.toCharArray()));
+		ObjectMapper mapper = new ObjectMapper();
 
-		return mapper.read(parser);
+		return mapper.readTree(parser);
 	}
-	
-	List<JsonNode> getAllObjects() throws Exception {
-		System.out.println(m_delegate.toCharArray());
-		JsonFactory fact = new JsonFactory();
-		JsonParser parser = fact.createJsonParser(new CharArrayReader(m_delegate
-				.toCharArray()));
-		JsonTypeMapper mapper = new JsonTypeMapper();
 
-		List<JsonNode> result = new ArrayList<JsonNode>();
-		
-		while (true) {
-			JsonNode node = mapper.read(parser);
-			if (node == null) {
-				break;
-			}
-			result.add(node);
-		}
-		
-		return result;
+	@Override
+	public void write(char[] cbuf, int off, int len) throws IOException {
+		m_delegate.write(cbuf, off, len);
 	}
 
 }

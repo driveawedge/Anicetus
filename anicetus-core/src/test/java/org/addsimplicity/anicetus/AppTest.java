@@ -14,7 +14,7 @@ import org.addsimplicity.anicetus.entity.GlobalInfoFields;
 import org.addsimplicity.anicetus.entity.JsonConstants;
 import org.addsimplicity.anicetus.entity.TelemetryTransaction;
 import org.addsimplicity.anicetus.entity.TransactionFields;
-import org.codehaus.jackson.map.JsonNode;
+import org.codehaus.jackson.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -54,10 +54,13 @@ public class AppTest {
 		List<JsonNode> nodes = m_adapter.getAllObjects();
 		assertEquals("Session Count", 2, nodes.size());
 
-		assertEquals("Session 1 Status", CompletionStatus.PartialSuccess.toString(), nodes.get(0).getFieldValue(
-				ExecInfoFields.Status.getJsonKey()).getTextValue());
-		assertEquals("Session 2 Status", CompletionStatus.Failure.toString(), nodes.get(1).getFieldValue(
-				ExecInfoFields.Status.getJsonKey()).getTextValue());
+		assertEquals("Session 1 Status",
+				CompletionStatus.PartialSuccess.toString(),
+				nodes.get(0).get(ExecInfoFields.Status.getJsonKey())
+						.getTextValue());
+		assertEquals("Session 2 Status", CompletionStatus.Failure.toString(),
+				nodes.get(1).get(ExecInfoFields.Status.getJsonKey())
+						.getTextValue());
 	}
 
 	/**
@@ -70,8 +73,7 @@ public class AppTest {
 		ExecInfo s = m_mgr.getSession();
 		try {
 			Thread.sleep(5);
-		}
-		catch (InterruptedException ie) {
+		} catch (InterruptedException ie) {
 			ie.printStackTrace();
 		}
 		s.setStatus(CompletionStatus.Success);
@@ -79,16 +81,21 @@ public class AppTest {
 
 		JsonNode node = m_adapter.getObjectGraph();
 
-		assertEquals("CompletionStatus", CompletionStatus.Success.toString(), node.getFieldValue(
-				ExecInfoFields.Status.getJsonKey()).getTextValue());
-		int dur = Integer.parseInt(node.getFieldValue(ExecInfoFields.Duration.getJsonKey()).getTextValue());
+		assertEquals("CompletionStatus", CompletionStatus.Success.toString(),
+				node.get(ExecInfoFields.Status.getJsonKey()).getTextValue());
+		int dur = Integer.parseInt(node.get(
+				ExecInfoFields.Duration.getJsonKey()).getTextValue());
 		assertTrue("Duration", dur >= 5000000);
-		assertEquals("OperationName", m_mgr.getOperationName(), node.getFieldValue(
-				ExecInfoFields.OperationName.getJsonKey()).getTextValue());
-		assertEquals("ReportingNode", m_mgr.getReportingNode(), node.getFieldValue(
-				GlobalInfoFields.ReportingNode.getJsonKey()).getTextValue());
-		assertNotNull("EntityId", node.getFieldValue(GlobalInfoFields.EntityId.getJsonKey()));
-		assertNotNull("TimeStamp", node.getFieldValue(GlobalInfoFields.TimeStamp.getJsonKey()));
+		assertEquals("OperationName", m_mgr.getOperationName(),
+				node.get(ExecInfoFields.OperationName.getJsonKey())
+						.getTextValue());
+		assertEquals("ReportingNode", m_mgr.getReportingNode(),
+				node.get(GlobalInfoFields.ReportingNode.getJsonKey())
+						.getTextValue());
+		assertNotNull("EntityId",
+				node.get(GlobalInfoFields.EntityId.getJsonKey()));
+		assertNotNull("TimeStamp",
+				node.get(GlobalInfoFields.TimeStamp.getJsonKey()));
 	}
 
 	@Test
@@ -105,19 +112,22 @@ public class AppTest {
 
 		JsonNode node = m_adapter.getObjectGraph();
 
-		JsonNode childs = node.getFieldValue("child");
+		JsonNode childs = node.get("child");
 		assertNotNull("Children", childs);
 		assertTrue("Array", childs.isArray());
 		assertEquals("Length", 2, childs.size());
 
-		String sessid = node.getFieldValue(GlobalInfoFields.EntityId.getJsonKey()).getTextValue();
+		String sessid = node.get(GlobalInfoFields.EntityId.getJsonKey())
+				.getTextValue();
 		assertNotNull("Session", sessid);
 
-		JsonNode ev = childs.getElementValue(0);
-		assertEquals("Event Type", "EV", ev.getFieldValue(JsonConstants.EntityType).getTextValue());
+		JsonNode ev = childs.get(0);
+		assertEquals("Event Type", "EV", ev.get(JsonConstants.EntityType)
+				.getTextValue());
 
-		JsonNode stn = childs.getElementValue(1);
-		assertEquals("State Type", "ST", stn.getFieldValue(JsonConstants.EntityType).getTextValue());
+		JsonNode stn = childs.get(1);
+		assertEquals("State Type", "ST", stn.get(JsonConstants.EntityType)
+				.getTextValue());
 	}
 
 	@Test
@@ -136,23 +146,28 @@ public class AppTest {
 
 		JsonNode node = m_adapter.getObjectGraph();
 
-		JsonNode childs = node.getFieldValue("child");
+		JsonNode childs = node.get("child");
 		assertNotNull("Children", childs);
 		assertTrue("Array", childs.isArray());
 		assertEquals("Length", 1, childs.size());
 
-		JsonNode trans = childs.getElementValue(0);
-		assertEquals("Trans Type", "TR", trans.getFieldValue(JsonConstants.EntityType).getTextValue());
-		assertEquals("Operation", "xyzz", trans.getFieldValue(ExecInfoFields.OperationName.getJsonKey()).getTextValue());
-		assertEquals("Resource", "test:url", trans.getFieldValue(TransactionFields.ResourceId.getJsonKey()).getTextValue());
+		JsonNode trans = childs.get(0);
+		assertEquals("Trans Type", "TR", trans.get(JsonConstants.EntityType)
+				.getTextValue());
+		assertEquals("Operation", "xyzz",
+				trans.get(ExecInfoFields.OperationName.getJsonKey())
+						.getTextValue());
+		assertEquals("Resource", "test:url",
+				trans.get(TransactionFields.ResourceId.getJsonKey())
+						.getTextValue());
 
-		JsonNode pnode = trans.getFieldValue(TransactionFields.Parameters.getJsonKey());
+		JsonNode pnode = trans.get(TransactionFields.Parameters.getJsonKey());
 		assertNotNull("Params", pnode);
 		assertTrue("Param Array", pnode.isArray());
 		assertEquals("Param Length", 2, pnode.size());
 
-		assertEquals("Param a", "a", pnode.getElementValue(0).getTextValue());
-		assertEquals("Param b", "b", pnode.getElementValue(1).getTextValue());
+		assertEquals("Param a", "a", pnode.get(0).getTextValue());
+		assertEquals("Param b", "b", pnode.get(1).getTextValue());
 
 	}
 }

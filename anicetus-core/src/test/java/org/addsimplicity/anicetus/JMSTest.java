@@ -28,7 +28,8 @@ public class JMSTest {
 
 	@Before
 	public void init() {
-		m_context = new ClassPathXmlApplicationContext(new String[] { "org/addsimplicity/anicetus/JMSTestBinding.xml" });
+		m_context = new ClassPathXmlApplicationContext(
+				new String[] { "org/addsimplicity/anicetus/JMSTestBinding.xml" });
 
 		m_mgr = (TelemetryContext) m_context.getBean("manager");
 	}
@@ -58,8 +59,7 @@ public class JMSTest {
 		ExecInfo s = m_mgr.getSession();
 		try {
 			Thread.sleep(5);
-		}
-		catch (InterruptedException ie) {
+		} catch (InterruptedException ie) {
 			ie.printStackTrace();
 		}
 		s.setStatus(CompletionStatus.Success);
@@ -142,7 +142,8 @@ public class JMSTest {
 
 		ExecInfo rsess = (ExecInfo) obj;
 
-		assertEquals("Status", CompletionStatus.PartialSuccess, rsess.getStatus());
+		assertEquals("Status", CompletionStatus.PartialSuccess,
+				rsess.getStatus());
 
 		Collection<GlobalInfo> childs = rsess.getChildren();
 		assertEquals("Children", 1, childs.size());
