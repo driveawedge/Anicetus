@@ -17,9 +17,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.JsonNode;
-import org.codehaus.jackson.map.JsonTypeMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Connector;
@@ -54,6 +54,15 @@ public class SessionTest {
 	Server m_server;
 	ServletHolder m_servletHolder;
 
+	private JsonNode parseResponse(HttpEntity entity) throws IOException {
+		JsonFactory fact = new JsonFactory();
+		JsonParser parser = fact.createJsonParser(entity.getContent());
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		return mapper.readTree(parser);
+	}
+
 	@Before
 	public void startServletEngine() {
 		m_server = new Server();
@@ -64,10 +73,8 @@ public class SessionTest {
 
 		Context ctx = new Context(m_server, "/");
 
-		ctx
-				.getInitParams()
-				.put(
-						"contextConfigLocation",
+		ctx.getInitParams()
+				.put("contextConfigLocation",
 						"classpath:org/addsimplicity/anicetus/web/JMSLaunch.xml,classpath:org/addsimplicity/anicetus/web/SessionTestBinding.xml");
 
 		ContextLoaderListener ctxLoader = new ContextLoaderListener();
@@ -95,8 +102,9 @@ public class SessionTest {
 
 		JsonNode node = parseResponse(entity);
 
-		ApplicationContext curCtx = WebApplicationContextUtils.getWebApplicationContext(m_servletHolder.getServlet()
-				.getServletConfig().getServletContext());
+		ApplicationContext curCtx = WebApplicationContextUtils
+				.getWebApplicationContext(m_servletHolder.getServlet()
+						.getServletConfig().getServletContext());
 
 		JmsTemplate tmpl = (JmsTemplate) curCtx.getBean("consumeTempl");
 		Object obj = tmpl.receiveAndConvert();
@@ -117,7 +125,8 @@ public class SessionTest {
 		m_server.start();
 
 		HttpClient client = new DefaultHttpClient();
-		HttpGet get = new HttpGet("http://localhost:" + s_PORT + "/?a=1&b=2&notpassed=3");
+		HttpGet get = new HttpGet("http://localhost:" + s_PORT
+				+ "/?a=1&b=2&notpassed=3");
 		get.setHeader("Content-Type", "text/plain");
 		UUID parent = UUID.randomUUID();
 		get.setHeader("X-Anicetus-Parent-GUID", parent.toString());
@@ -128,8 +137,9 @@ public class SessionTest {
 
 		JsonNode node = parseResponse(entity);
 
-		ApplicationContext curCtx = WebApplicationContextUtils.getWebApplicationContext(m_servletHolder.getServlet()
-				.getServletConfig().getServletContext());
+		ApplicationContext curCtx = WebApplicationContextUtils
+				.getWebApplicationContext(m_servletHolder.getServlet()
+						.getServletConfig().getServletContext());
 
 		JmsTemplate tmpl = (JmsTemplate) curCtx.getBean("consumeTempl");
 		Object obj = tmpl.receiveAndConvert();
@@ -148,17 +158,9 @@ public class SessionTest {
 
 	}
 
-	private JsonNode parseResponse(HttpEntity entity) throws IOException {
-		JsonFactory fact = new JsonFactory();
-		JsonParser parser = fact.createJsonParser(entity.getContent());
-
-		JsonTypeMapper mapper = new JsonTypeMapper();
-
-		return mapper.read(parser);
-	}
-
-	private void validateHeaders(JsonNode node, HttpResponse resp, TelemetryHttpSession hsess) throws Exception {
-		JsonNode hnode = node.getFieldValue("HEADERS");
+	private void validateHeaders(JsonNode node, HttpResponse resp,
+			TelemetryHttpSession hsess) throws Exception {
+		JsonNode hnode = node.get("HEADERS");
 
 		Iterator<JsonNode> hiter = hnode.getElements();
 		while (hiter.hasNext()) {
@@ -169,7 +171,7 @@ public class SessionTest {
 				if (s_exclHeaders.contains(n)) {
 					continue;
 				}
-				Iterator<JsonNode> viter = h.getFieldValue(n).getElements();
+				Iterator<JsonNode> viter = h.get(n).getElements();
 				String svals[] = hsess.getHeaderValues(n, HeaderType.Request);
 				assertNotNull(n, svals);
 				for (int v = 0; viter.hasNext(); v++) {
@@ -187,13 +189,15 @@ public class SessionTest {
 			}
 			String value = rh.getValue();
 
-			assertEquals(name, value, hsess.getHeader(name, HeaderType.Response));
+			assertEquals(name, value,
+					hsess.getHeader(name, HeaderType.Response));
 		}
 
 	}
 
-	private void validateParams(JsonNode node, TelemetryHttpSession hsess) throws Exception {
-		JsonNode pnode = node.getFieldValue("PARAMS");
+	private void validateParams(JsonNode node, TelemetryHttpSession hsess)
+			throws Exception {
+		JsonNode pnode = node.get("PARAMS");
 
 		Iterator<JsonNode> piter = pnode.getElements();
 		while (piter.hasNext()) {
@@ -204,7 +208,7 @@ public class SessionTest {
 				if (s_exclParams.contains(n)) {
 					continue;
 				}
-				String val = p.getFieldValue(n).getValueAsText();
+				String val = p.get(n).getValueAsText();
 
 				assertEquals(n, val, hsess.getParameter(n));
 			}
