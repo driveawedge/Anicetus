@@ -15,3 +15,16 @@ Support is currently provided by Dan Pritchett:
 
 driveawedge@gmail.com
 
+h1. Build Instructions
+
+Each component is built with Maven. Unfortunately building the Flume adapter does require special
+steps due to Thrift and Flume not being in the Maven repository.
+
+h2. Thrift
+
+First download the Thrift from Apache - http://incubator.apache.org/thrift/download/
+
+Unpack the archive and follow the directions for building Thrift.
+
+Finally install libthrift.jar from the directory lib/java after your build finishes into your
+maven repository.
